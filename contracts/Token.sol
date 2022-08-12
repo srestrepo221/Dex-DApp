@@ -16,5 +16,15 @@ contract Token {
 	// setting the visibility of the variable with the keyword public
 	// soliditiy will create special functions for us
 	// whenever we deploy the SC, now we can access the name value of My Token
-	string public name = "Green Bros";
+	string public name;
+	string public symbol;
+	uint256 public decimals = 18; //unsigned integer thats 256 bits
+	uint256 public totalSupply;
+	// 1,000,000 * 10^18 two stars is exponents
+
+	constructor(string memory _name, string memory _symbol, uint256 _totalSupply) { // _ is used for local variables
+		name = _name;
+		symbol = _symbol; 
+		totalSupply = _totalSupply * (10**decimals); 
+	}
 }
