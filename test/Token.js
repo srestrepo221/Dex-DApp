@@ -99,7 +99,7 @@ describe('Token', ()=> {
 			it('allocates an allowance for delegated token spending', async () => {
 				expect(await token.allowance(deployer.address, exchange.address)).to.equal(amount)
 			})
-			it('emits an approal event', async () => {
+			it('emits an approval event', async () => {
 			const event = result.events[0]
 			expect(event.event).to.equal('Approval')
 			
