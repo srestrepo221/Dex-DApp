@@ -12,7 +12,7 @@ describe('Token', ()=> {
 
 	beforeEach(async () => {
 		const Token = await ethers.getContractFactory('Token') // gets contract itself
-		token = await Token.deploy('Green Bros', 'GB', 1000000) // now we want a deployed instance of the contract
+		token = await Token.deploy('Green Bros', 'GB', '1000000') // now we want a deployed instance of the contract
 		
 		accounts = await ethers.getSigners()
 		deployer = accounts[0]
