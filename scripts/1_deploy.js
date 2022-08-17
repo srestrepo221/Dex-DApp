@@ -11,7 +11,7 @@ async function main() {
    console.log(`Accounts fetched:\n${accounts[0].address}\n${accounts[1].address}\n`)
 
   // deploy contracts
-  const gb = await Token.deploy('Green Bros', 'GB', '1000000')
+  const gb = await Token.deploy('GreenBros', 'GB', '1000000')
   await gb.deployed()
   console.log(`GreenBros Deployed to: ${gb.address}`)
 

@@ -21,7 +21,7 @@ async function main() {
 
 	// fetch deployed tokens
 	const gb = await ethers.getContractAt('Token', config[chainId].gb.address)
-	console.log(`Green Bros Token fetched: ${gb.address}\n`)
+	console.log(`GreenBros Token fetched: ${gb.address}\n`)
 
 	const mETH = await ethers.getContractAt('Token', config[chainId].mETH.address)
 	console.log(`mETH Token fetched: ${mETH.address}\n`)
