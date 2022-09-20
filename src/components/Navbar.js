@@ -1,38 +1,37 @@
 import { useSelector, useDispatch } from 'react-redux'
 import Blockies from 'react-blockies'
 
-import logo from '../assets/greenbros.png'
+import logo from '../assets/logo.png'
 import eth from '../assets/eth.svg'
-
 
 import { loadAccount } from '../store/interactions'
 
 import config from '../config.json';
 
 const Navbar = () => {
-	const provider = useSelector(state => state.provider.connection)
-	const chainId = useSelector(state => state.provider.chainId)
-	const account = useSelector(state => state.provider.account)
-	const balance = useSelector(state => state.provider.balance)
+  const provider = useSelector(state => state.provider.connection)
+  const chainId = useSelector(state => state.provider.chainId)
+  const account = useSelector(state => state.provider.account)
+  const balance = useSelector(state => state.provider.balance)
 
-	const dispatch = useDispatch()
+  const dispatch = useDispatch()
 
-	const connectHandler = async () => {
-		await loadAccount(provider, dispatch)
-	}
-	const networkHandler = async (e) => {
-		await window.ethereum.request({
-			method: 'wallet_switchEthereumChain',
-			params: [{ chainId: e.target.value }]
-		})
-	}
+  const connectHandler = async () => {
+    await loadAccount(provider, dispatch)
+  }
+
+  const networkHandler = async (e) => {
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: e.target.value }],
+    })
+  }
 
   return(
     <div className='exchange__header grid'>
       <div className='exchange__header--brand flex'>
-      <img src={logo} className="logo" alt="GB Logo"></img>
-      <h1>GreenBros Token Exchange</h1>
-
+        <img src={logo} className="logo" alt="DApp Logo"></img>
+        <h1>DApp Token Exchange</h1>
       </div>
 
       <div className='exchange__header--networks flex'>

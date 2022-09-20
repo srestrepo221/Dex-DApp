@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import config from '../config.json';
 
-
 import {
   loadProvider,
   loadNetwork,
@@ -16,11 +15,11 @@ import Navbar from './Navbar'
 function App() {
   const dispatch = useDispatch()
 
-  const loadBlockchainData = async () => { 
-    // connect Ethers to blockchain
+  const loadBlockchainData = async () => {
+    // Connect Ethers to blockchain
     const provider = loadProvider(dispatch)
 
-    // Fetch current networks's chainId(e.g. hardhat: 31337, kovan: 42)
+    // Fetch current network's chainId (e.g. hardhat: 31337, kovan: 42)
     const chainId = await loadNetwork(provider, dispatch)
 
     // Reload page when network changes
@@ -32,23 +31,20 @@ function App() {
     window.ethereum.on('accountsChanged', () => {
       loadAccount(provider, dispatch)
     })
-   
 
-   
-
-    // Load token smart contract
-    const gb = config[chainId].gb
+    // Load token smart contracts
+    const DApp = config[chainId].DApp
     const mETH = config[chainId].mETH
-    await loadTokens(provider, [gb.address, mETH.address],dispatch)
+    await loadTokens(provider, [DApp.address, mETH.address], dispatch)
 
     // Load exchange smart contract
     const exchangeConfig = config[chainId].exchange
     await loadExchange(provider, exchangeConfig.address, dispatch)
   }
 
-useEffect(() => {
-  loadBlockchainData()
-})
+  useEffect(() => {
+    loadBlockchainData()
+  })
 
   return (
     <div>

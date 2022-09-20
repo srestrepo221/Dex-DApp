@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+//SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
@@ -13,21 +13,18 @@ contract Exchange {
     mapping(uint256 => bool) public orderCancelled;
     mapping(uint256 => bool) public orderFilled;
 
-
     event Deposit(
-    	address token,
-    	address user,
-    	uint256 amount,
-    	uint256 balance
+        address token,
+        address user,
+        uint256 amount,
+        uint256 balance
     );
-
     event Withdraw(
         address token,
         address user,
         uint256 amount,
         uint256 balance
     );
-
     event Order(
         uint256 id,
         address user,
@@ -37,8 +34,7 @@ contract Exchange {
         uint256 amountGive,
         uint256 timestamp
     );
-
-     event Cancel(
+    event Cancel(
         uint256 id,
         address user,
         address tokenGet,
@@ -47,8 +43,7 @@ contract Exchange {
         uint256 amountGive,
         uint256 timestamp
     );
-
-      event Trade(
+    event Trade(
         uint256 id,
         address user,
         address tokenGet,
@@ -59,14 +54,15 @@ contract Exchange {
         uint256 timestamp
     );
 
-    struct _Order{
-    	uint256 id;
-    	address user;
-    	address tokenGet;
-    	uint256 amountGet;
-    	address tokenGive;
-    	uint256 amountGive;
-    	uint256 timestamp;
+    struct _Order {
+        // Attributes of an order
+        uint256 id; // Unique identifier for order
+        address user; // User who made order
+        address tokenGet; // Address of the token they receive
+        uint256 amountGet; // Amount they receive
+        address tokenGive; // Address of token they give
+        uint256 amountGive; // Amount they give
+        uint256 timestamp; // When order was created
     }
 
     constructor(address _feeAccount, uint256 _feePercent) {
@@ -111,121 +107,139 @@ contract Exchange {
         return tokens[_token][_user];
     }
 
-    //------------
-	// make & cancel orders
-	// Token give (the token they want to spend) - which token, and how much?
-	// Token get  (the token they want to receive) - which token, and how much?
-	function makeOrder(
-		address _tokenGet,
-		uint256 _amountGet,
-		address _tokenGive,
-		uint256 _amountGive
-	) public {
-		//require token balance
-		require(balanceOf(_tokenGive, msg.sender) >= _amountGive);
-		//instantiate new order
-		orderCount ++;
-		orders[orderCount] = _Order(
-			orderCount,
-			msg.sender,
-			_tokenGet,
-			_amountGet,
-			_tokenGive,
-			_amountGive,
-			block.timestamp
-		);
-		// emit event 
-		emit Order(	
-			orderCount,
-			msg.sender,
-			_tokenGet,
-			_amountGet,
-			_tokenGive,
-			_amountGive,
-			block.timestamp
-		);
- 	}
 
- 	function cancelOrder(uint256 _id) public {
- 		_Order storage _order = orders[_id];
+    // ------------------------
+    // MAKE & CANCEL ORDERS
 
- 		require(address(_order.user) == msg.sender); 
+    function makeOrder(
+        address _tokenGet,
+        uint256 _amountGet,
+        address _tokenGive,
+        uint256 _amountGive
+    ) public {
+        // Prevent orders if tokens aren't on exchange
+        require(balanceOf(_tokenGive, msg.sender) >= _amountGive);
 
- 		require(_order.id == _id); 
+        // Instantiate a new order
+        orderCount ++;
+        orders[orderCount] = _Order(
+            orderCount,
+            msg.sender,
+            _tokenGet,
+            _amountGet,
+            _tokenGive,
+            _amountGive,
+            block.timestamp
+        );
 
-		orderCancelled[_id] = true;
+        // Emit event
+        emit Order(
+            orderCount,
+            msg.sender,
+            _tokenGet,
+            _amountGet,
+            _tokenGive,
+            _amountGive,
+            block.timestamp
+        );
+    }
 
- 		emit Cancel(
- 			_order.id,
- 			msg.sender,
- 			_order.tokenGet,
- 			_order.amountGet,
- 			_order.tokenGive,
- 			_order.amountGive,
- 			block.timestamp
- 		);
- 	}
+    function cancelOrder(uint256 _id) public {
+        // Fetch order
+        _Order storage _order = orders[_id];
 
- 	function fillOrder(uint256 _id) public {
- 		// must be a valid order
- 		require(_id > 0 && _id <= orderCount, "Order does not exist");
+        // Ensure the caller of the function is the owner of the order
+        require(address(_order.user) == msg.sender);
 
- 		// order cant be filled
- 		require(!orderFilled[_id]);
+        // Order must exist
+        require(_order.id == _id);
 
- 		// order cant be cancelled
- 		require(!orderCancelled[_id]);
+        // Cancel the order
+        orderCancelled[_id] = true;
+
+        // Emit event
+        emit Cancel(
+            _order.id,
+            msg.sender,
+            _order.tokenGet,
+            _order.amountGet,
+            _order.tokenGive,
+            _order.amountGive,
+            block.timestamp
+        );
+    }
 
 
- 		// fetch order
- 		_Order storage _order = orders[_id];
+    // ------------------------
+    // EXECUTING ORDERS
 
- 		// execute the trade
- 		_trade(
- 			_order.id,
- 			_order.user,
- 			_order.tokenGet,
- 			_order.amountGet,
- 			_order.tokenGive,
- 			_order.amountGive
- 			);
+    function fillOrder(uint256 _id) public {
+        // 1. Must be valid orderId
+        require(_id > 0 && _id <= orderCount, "Order does not exist");
+        // 2. Order can't be filled
+        require(!orderFilled[_id]);
+        // 3. Order can't be cancelled
+        require(!orderCancelled[_id]);
 
- 		// Mark order as filled
- 		orderFilled[_order.id] = true; 
- 	}
+        // Fetch order
+        _Order storage _order = orders[_id];
 
- 	function _trade(
- 		uint256 _orderId,
- 		address _user,
- 		address _tokenGet,
- 		uint256 _amountGet,
- 		address _tokenGive,
- 		uint256 _amountGive
- 		) internal {
+        // Execute the trade
+        _trade(
+            _order.id,
+            _order.user,
+            _order.tokenGet,
+            _order.amountGet,
+            _order.tokenGive,
+            _order.amountGive
+        );
 
- 		uint256 _feeAmount = (_amountGet * feePercent) / 100;   
+        // Mark order as filled
+        orderFilled[_order.id] = true;
+    }
 
+    function _trade(
+        uint256 _orderId,
+        address _user,
+        address _tokenGet,
+        uint256 _amountGet,
+        address _tokenGive,
+        uint256 _amountGive
+    ) internal {
+        // Fee is paid by the user who filled the order (msg.sender)
+        // Fee is deducted from _amountGet
+        uint256 _feeAmount = (_amountGet * feePercent) / 100;
 
- 		tokens[_tokenGet][msg.sender] = tokens[_tokenGet][msg.sender] - (_amountGet + _feeAmount); 
- 		tokens[_tokenGet][_user] = tokens[_tokenGet][_user] + _amountGet; 
+        // Execute the trade
+        // msg.sender is the user who filled the order, while _user is who created the order
+        tokens[_tokenGet][msg.sender] =
+            tokens[_tokenGet][msg.sender] -
+            (_amountGet + _feeAmount);
 
+        tokens[_tokenGet][_user] = tokens[_tokenGet][_user] + _amountGet;
 
- 		tokens[_tokenGet][feeAccount] = tokens[_tokenGet][feeAccount] + _feeAmount; 
+        // Charge fees
+        tokens[_tokenGet][feeAccount] =
+            tokens[_tokenGet][feeAccount] +
+            _feeAmount;
 
+        tokens[_tokenGive][_user] = tokens[_tokenGive][_user] - _amountGive;
+        tokens[_tokenGive][msg.sender] =
+            tokens[_tokenGive][msg.sender] +
+            _amountGive;
 
- 		tokens[_tokenGive][_user] = tokens[_tokenGive][_user] - _amountGive;
- 		tokens[_tokenGive][msg.sender] = tokens[_tokenGive][msg.sender] + _amountGive;
+        // Emit trade event
+        emit Trade(
+            _orderId,
+            msg.sender,
+            _tokenGet,
+            _amountGet,
+            _tokenGive,
+            _amountGive,
+            _user,
+            block.timestamp
+        );
+    }
 
-
- 		emit Trade(
- 			_orderId,
- 			msg.sender,
- 			_tokenGet,
- 			_amountGet,
- 			_tokenGive,
- 			_amountGive,
- 			_user,
- 			block.timestamp
- 		);
- 	}
 }
+
