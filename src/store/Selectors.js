@@ -56,6 +56,71 @@ const decorateOrder = (order, tokens) => {
 }
 
 // ---------------------------------------------------------------------
+// ALL FILLED ORDERS
+
+export const filledOrderSelector = createSelector(
+	filledOrders,
+	tokens,
+	(orders, tokens) => {
+	 if (!tokens[0] || !tokens[1]) { return }	
+
+	 // Filter orders by selected tokens
+    orders = orders.filter((o) => o.tokenGet === tokens[0].address || o.tokenGet === tokens[1].address)
+    orders = orders.filter((o) => o.tokenGive === tokens[0].address || o.tokenGive === tokens[1].address)
+
+	// sort orders by time ascending for price comparison
+	orders = orders.sort((a,b) => a.timestamp - b.timestamp)
+
+	// decorate the orders
+	orders = decorateFilledOrders(orders, tokens)
+
+	// sort orders by date descending for display
+	orders = orders.sort((a,b) => b.timestamp - a.timestamp)
+
+	console.log(orders)
+
+	return orders
+
+	}
+)
+
+const decorateFilledOrders = (orders, tokens) => {
+	// track the previous order to compare history
+	let previousOrder = orders[0]
+	return(
+		orders.map((order) => {
+		// decorate each individual order
+		order = decorateOrder(order, tokens)
+		order = decorateFilledOrder(order, previousOrder)
+		previousOrder = order // Update the previous order once its decorated
+		return order
+		})
+	)
+}
+
+const decorateFilledOrder = (order, previousOrder) => {
+	return({
+		...order,
+		tokenPriceClass: tokenPriceClass(order.tokenPrice, order.id, previousOrder)
+	})
+}
+
+const tokenPriceClass = (tokenPrice, orderId, previousOrder) => {
+	// show green price if inly one order exists 
+	if(previousOrder.id == orderId) {
+		return GREEN
+	}
+
+	// show green price if order price higher than previous order
+	// show red price if order price lower than previous order 
+	if(previousOrder.tokenPrice <= tokenPrice) {
+		return GREEN // success
+	} else {
+		return RED // danger
+	}
+}
+
+// ---------------------------------------------------------------------
 // ORDER BOOK
 
 export const orderBookSelector = createSelector(
