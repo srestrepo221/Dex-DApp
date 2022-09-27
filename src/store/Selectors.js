@@ -7,7 +7,9 @@ const GREEN = '#25CE8F'
 const RED = '#F45353'
 
 
+const account = state => get(state, 'provider.account')
 const tokens = state => get(state, 'tokens.contracts')
+
 
 const allOrders = state => get(state, 'exchange.allOrders.data', [])
 const cancelledOrders = state => get(state, 'exchange.cancelledOrders.data', [])
@@ -26,6 +28,54 @@ const openOrders = state => {
 
   return openOrders
 
+}
+
+// ---------------------------------------------------------------------
+// MY OPEN ORDERS
+
+export const myOpenOrderSelector = createSelector(
+	account,
+	tokens,
+	openOrders,
+	(account, tokens, orders) => {
+		if(!tokens[0] || !tokens[1]) { return }
+
+	// filter orders createad by current account
+	orders = orders.filter((o) => o.user === account)
+
+	// fitler orders by token addresses
+	// Filter orders by selected tokens
+    orders = orders.filter((o) => o.tokenGet === tokens[0].address || o.tokenGet === tokens[1].address)
+    orders = orders.filter((o) => o.tokenGive === tokens[0].address || o.tokenGive === tokens[1].address)
+
+    // decorate orders - add display attributes
+    orders = decorateMyOpenOrders(orders, tokens)
+
+    // sort orders by date descending
+    orders = orders.sort((a,b) => b.timestamp - a.timestamp)
+
+    return orders
+ }
+)
+
+const decorateMyOpenOrders = (orders, tokens) => {
+	return(
+	orders.map((order) => {
+		order = decorateOrder(order, tokens)
+		order = decorateMyOpenOrder(order, tokens)
+		return(order)
+	})
+	)
+}
+
+const decorateMyOpenOrder = (order, tokens) => {
+	let orderType = order.tokenGive === tokens[1].address ? 'buy' : 'sell'
+
+	return({
+		...order,
+		orderType,
+		orderTypeClass: (orderType === 'buy' ? GREEN : RED)
+	})
 }
 
 const decorateOrder = (order, tokens) => {
@@ -76,8 +126,6 @@ export const filledOrderSelector = createSelector(
 
 	// sort orders by date descending for display
 	orders = orders.sort((a,b) => b.timestamp - a.timestamp)
-
-	console.log(orders)
 
 	return orders
 
@@ -222,7 +270,6 @@ export const priceChartSelector = createSelector(
 
   }
 )
-
 
 const buildGraphData = (orders) => {
   	// Group the orders by hour for the graph
