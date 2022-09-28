@@ -52,12 +52,12 @@ export const loadExchange = async (provider, address, dispatch) => {
 }
 
 export const subscribeToEvents = (exchange, dispatch) => {
-    exchange.on('Cancel', (id, user, tokenGet, amountGet, tokenGive, amountGive, timestamp, event) => {
+  exchange.on('Cancel', (id, user, tokenGet, amountGet, tokenGive, amountGive, timestamp, event) => {
     const order = event.args
     dispatch({ type: 'ORDER_CANCEL_SUCCESS', order, event })
   })
 
-    exchange.on('Trade', (id, user, tokenGet, amountGet, tokenGive, amountGive, creator, timestamp, event) => {
+  exchange.on('Trade', (id, user, tokenGet, amountGet, tokenGive, amountGive, creator, timestamp, event) => {
     const order = event.args
     dispatch({ type: 'ORDER_FILL_SUCCESS', order, event })
   })
@@ -74,7 +74,6 @@ export const subscribeToEvents = (exchange, dispatch) => {
     const order = event.args
     dispatch({ type: 'NEW_ORDER_SUCCESS', order, event })
   })
-
 }
 
 // ------------------------------------------------------------------------------
@@ -95,6 +94,7 @@ export const loadBalances = async (exchange, tokens, account, dispatch) => {
   dispatch({ type: 'EXCHANGE_TOKEN_2_BALANCE_LOADED', balance })
 
 }
+
 
 // ------------------------------------------------------------------------------
 // LOAD ALL ORDERS
@@ -121,6 +121,7 @@ export const loadAllOrders = async (provider, exchange, dispatch) => {
 
   dispatch({ type: 'ALL_ORDERS_LOADED', allOrders })
 }
+
 
 // ------------------------------------------------------------------------------
 // TRANSFER TOKENS (DEPOSIT & WITHDRAWS)
@@ -190,8 +191,9 @@ export const makeSellOrder = async (provider, exchange, tokens, order, dispatch)
 // CANCEL ORDER
 
 export const cancelOrder = async (provider, exchange, order, dispatch) => {
+
   dispatch({ type: 'ORDER_CANCEL_REQUEST' })
-  
+
   try {
     const signer = await provider.getSigner()
     const transaction = await exchange.connect(signer).cancelOrder(order.id)
@@ -201,13 +203,12 @@ export const cancelOrder = async (provider, exchange, order, dispatch) => {
   }
 }
 
-
 // ------------------------------------------------------------------------------
 // FILL ORDER
 
 export const fillOrder = async (provider, exchange, order, dispatch) => {
   dispatch({ type: 'ORDER_FILL_REQUEST' })
-  
+
   try {
     const signer = await provider.getSigner()
     const transaction = await exchange.connect(signer).fillOrder(order.id)
@@ -216,9 +217,3 @@ export const fillOrder = async (provider, exchange, order, dispatch) => {
     dispatch({ type: 'ORDER_FILL_FAIL' })
   }
 }
-
-
-
-
-
-
