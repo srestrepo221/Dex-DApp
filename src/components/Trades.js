@@ -2,13 +2,13 @@ import { useSelector } from 'react-redux'
 
 import sort from '../assets/sort.svg'
 
-import { filledOrderSelector } from '../store/Selectors'
+import { filledOrdersSelector } from '../store/Selectors'
 
 import Banner from './Banner'
 
 const Trades = () => {
   const symbols = useSelector(state => state.tokens.symbols)
-  const filledOrders = useSelector(filledOrderSelector)
+  const filledOrders = useSelector(filledOrdersSelector)
   
 return (
     <div className="component exchange__trades">
@@ -39,11 +39,9 @@ return (
           )
         })}
 
-
-          
         </tbody>
       </table>
-      )}
+    )}
     </div>
   );
 }
