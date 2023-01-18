@@ -1,14 +1,19 @@
-# Sample Hardhat Project
+# Decentralized Cryptocurrency Exchange Project
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+This project utlizes two smart contracts to swap ERC-20 tokens on an exchange
+The Token contract issues mDAI, mETH, and DAPP
+The exchange contract allows users to make and fill orders for the created tokens
+The UI uses React and Redux
+Hardhat environment and ethers libraries with JavaScript testing
+Users connect to the exchange via Metamask
 
 Try running some of the following tasks:
 
 ```shell
 npx hardhat help
 npx hardhat test
-GAS_REPORT=true npx hardhat test
 npx hardhat node
-npx hardhat run scripts/deploy.js
+npx hardhat run deploy/localhost
+npx hardhat run seed/localhost
 ```
-# cryptocurrency
+
