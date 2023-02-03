@@ -21,8 +21,8 @@ Try running some of the following tasks:
 npx hardhat help
 npx hardhat test
 npx hardhat node
-npx hardhat run deploy/localhost
-npx hardhat run seed/localhost
+npm run deploy/localhost
+npm run seed/localhost
 ```
 
 
