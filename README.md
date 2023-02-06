@@ -20,7 +20,7 @@ Hardhat environment and ethers libraries with JavaScript testing.
 
 Users connect to the exchange via Metamask.
 
-Try running some of the following tasks:
+Try running some of the following tasks :
 
 ```shell
 npx hardhat help
